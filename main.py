@@ -1,10 +1,14 @@
-import os
 from dotenv import load_dotenv
 from openai import OpenAI
+import os
+
 
 def main():
     load_dotenv()
     api_key = os.environ.get("OPENROUTER_API_KEY")
+
+    if not api_key:
+        raise RuntimeError("API key not found")
 
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
@@ -21,7 +25,13 @@ def main():
         ],
     )
 
+    if not response.usage:
+        raise RuntimeError("Could not find usage data")
+
     print(response.choices[0].message.content)
+    print(
+        f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}"
+    )
 
 
 if __name__ == "__main__":
